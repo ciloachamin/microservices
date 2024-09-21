@@ -1,0 +1,23 @@
+
+### Postgres Database for Catalog Service
+services:
+  db-catalog:
+    container_name: db-catalog
+    image: postgres:15.2
+    environment:
+      POSTGRES_DB: ms_catalog
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5434:5432"
+    expose:
+      - "5434"
+    volumes:
+      - db-catalog-data:/var/lib/postgresql/data
+    networks:
+      - ms-marketplace-network
+    restart: unless-stopped
+networks:
+  ms-marketplace-network:
+volumes:
+  db-catalog-data:

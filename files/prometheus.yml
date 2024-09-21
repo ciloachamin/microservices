@@ -1,0 +1,22 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+scrape_configs:
+  - job_name: 'ms-catalog'
+    metrics_path: '/actuator/catalog/prometheus'
+    static_configs:
+      - targets: ['host.docker.internal:8080']
+        labels:
+          application: 'Catalog Service'
+  - job_name: 'ms-orders'
+    metrics_path: '/actuator/orders/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8080' ]
+        labels:
+          application: 'Order Service'
+  - job_name: 'ms-inventory'
+    metrics_path: '/actuator/inventory/prometheus'
+    static_configs:
+      - targets: [ 'host.docker.internal:8080' ]
+        labels:
+          application: 'Inventory Service'

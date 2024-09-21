@@ -1,0 +1,26 @@
+version: '3'
+### MySQL Database for Orders Service
+services:
+    db-orders:
+        container_name: db-orders
+        image: mysql:8.0.33
+        environment:
+          MYSQL_DATABASE: ms_orders
+          MYSQL_USER: mysql
+          MYSQL_PASSWORD: 123456
+          MYSQL_ROOT_PASSWORD: 123456
+        ports:
+        - "3307:3306"
+        expose:
+          - 3307
+        volumes:
+        - db-orders-data:/var/lib/mysql
+        networks:
+        - ms-marketplace-network
+        restart: unless-stopped
+
+
+networks:
+  ms-marketplace-network:
+volumes:
+  db-orders-data:

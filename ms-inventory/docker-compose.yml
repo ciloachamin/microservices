@@ -1,0 +1,23 @@
+version: '3'
+### Postgres Database for Inventory Service
+services:
+    db-inventory:
+        container_name: db-inventory
+        image: postgres:15.2
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: 123456
+          POSTGRES_DB: ms_inventory
+        ports:
+        - "5433:5432"
+        expose:
+          - 5433
+        volumes:
+        - db-inventory-data:/var/lib/postgresql/data
+        networks:
+        - ms-marketplace-network
+        restart: unless-stopped
+networks:
+  ms-marketplace-network:
+volumes:
+  db-inventory-data:
