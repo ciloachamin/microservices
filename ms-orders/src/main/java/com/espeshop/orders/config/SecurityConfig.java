@@ -27,8 +27,13 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers(request ->
-                                        request.getRequestURI().contains("/actuator/orders")).permitAll()
+                        auth
+                                .requestMatchers("/swagger-ui/**",
+                                        "/swagger-resources/*",
+                                        "/v3/api-docs/**").permitAll()
+                                .requestMatchers(request ->
+                                        request.getRequestURI().contains("/actuator/orders")
+                                ).permitAll()
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer(configure -> configure.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthConverter())));
 
