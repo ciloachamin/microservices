@@ -21,13 +21,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/product")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Product", description = "Operations related to products")
 public class ProductController {
     private final ProductService productService;
 
-    @PostMapping
+    @PostMapping("/product")
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(
@@ -43,7 +43,7 @@ public class ProductController {
         return new ResponseEntity<>(productService.createProduct(productRequest), HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @GetMapping("/products")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
@@ -86,7 +86,7 @@ public class ProductController {
         return ResponseEntity.ok(productService.getAllProducts(pageable, filters));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("product/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(
@@ -106,7 +106,7 @@ public class ProductController {
         return ResponseEntity.ok(updatedProduct);
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("product/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(
@@ -123,7 +123,7 @@ public class ProductController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("product/{id}")
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
