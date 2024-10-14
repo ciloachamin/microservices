@@ -37,7 +37,7 @@ class SwaggerConfig {
         definitions.stream()
                 .filter(routeDefinition -> routeDefinition.getId().matches("ms-.*")) // Filtrar por prefijo "ms-"
                 .forEach(routeDefinition -> {
-                    String name = routeDefinition.getId().replaceAll("ms-", "api/"); // Quitar el prefijo "ms-"
+                    String name = routeDefinition.getId().replaceAll("ms-", ""); // Quitar el prefijo "ms-"
                     log.info("Adding Swagger URL: {}", name);
                     AbstractSwaggerUiConfigProperties.SwaggerUrl swaggerUrl =
                             new AbstractSwaggerUiConfigProperties.SwaggerUrl(

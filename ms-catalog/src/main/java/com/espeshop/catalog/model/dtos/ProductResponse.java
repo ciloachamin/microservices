@@ -1,4 +1,4 @@
-package com.espeshop.catalog.model.dto;
+package com.espeshop.catalog.model.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

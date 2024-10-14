@@ -19,6 +19,7 @@ public class SecurityConfig {
                     auth.pathMatchers("/v3/api-docs/**").permitAll();
                     auth.anyExchange().authenticated();
                 })
+
                 .oauth2Login(Customizer.withDefaults());
 
         return http.build();
