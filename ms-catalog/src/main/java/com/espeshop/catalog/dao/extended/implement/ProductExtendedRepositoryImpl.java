@@ -41,8 +41,8 @@ public class ProductExtendedRepositoryImpl implements ProductExtendedRepository 
             predicates.add(namePredicate);
         }
 
-        if (filters.getSkuCode() != null) {
-            Predicate skuCodePredicate = cb.like(root.get("skuCode"), "%" + filters.getSkuCode() + "%");
+        if (filters.getCode() != null) {
+            Predicate skuCodePredicate = cb.like(root.get("skuCode"), "%" + filters.getCode() + "%");
             predicates.add(skuCodePredicate);
         }
 
@@ -62,6 +62,28 @@ public class ProductExtendedRepositoryImpl implements ProductExtendedRepository 
             predicates.add(dateEndPredicate);
         }
 
+        if (filters.getPriceMin() != null && filters.getPriceMax() != null) {
+            Predicate priceRangePredicate = cb.between(root.get("price"), filters.getPriceMin(), filters.getPriceMax());
+            predicates.add(priceRangePredicate);
+        } else if (filters.getPriceMin() != null) {
+            Predicate priceMinPredicate = cb.greaterThanOrEqualTo(root.get("price"), filters.getPriceMin());
+            predicates.add(priceMinPredicate);
+        } else if (filters.getPriceMax() != null) {
+            Predicate priceMaxPredicate = cb.lessThanOrEqualTo(root.get("price"), filters.getPriceMax());
+            predicates.add(priceMaxPredicate);
+        }
+
+        if (filters.getStockMin() != null && filters.getStockMax() != null) {
+            Predicate stockRangePredicate = cb.between(root.get("stock"), filters.getStockMin(), filters.getStockMax());
+            predicates.add(stockRangePredicate);
+        } else if (filters.getStockMin() != null) {
+            Predicate stockMinPredicate = cb.greaterThanOrEqualTo(root.get("stock"), filters.getStockMin());
+            predicates.add(stockMinPredicate);
+        } else if (filters.getStockMax() != null) {
+            Predicate stockMaxPredicate = cb.lessThanOrEqualTo(root.get("stock"), filters.getStockMax());
+            predicates.add(stockMaxPredicate);
+        }
+
         if (filters.getDeleted() != null) {
             predicates.add(cb.equal(root.get("deleted"), filters.getDeleted()));
         }
@@ -72,6 +94,20 @@ public class ProductExtendedRepositoryImpl implements ProductExtendedRepository 
 
         if (filters.getUserId() != null) {
             predicates.add(cb.equal(root.get("userId"), filters.getUserId()));
+        }
+
+        if (filters.getCategoryId() != null) {
+            predicates.add(cb.equal(root.get("categoryId"), filters.getCategoryId()));
+        }
+        if (filters.getCompanyId() != null) {
+            predicates.add(cb.equal(root.get("companyId"), filters.getCompanyId()));
+        }
+        if (filters.getBrand() != null) {
+            predicates.add(cb.equal(root.get("brand"), filters.getBrand()));
+        }
+
+        if (filters.getBarcode() != null) {
+            predicates.add(cb.equal(root.get("barcode"), filters.getBarcode()));
         }
 
         query.where(

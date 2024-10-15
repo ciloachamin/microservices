@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -59,30 +61,63 @@ public class ProductController {
                     @Parameter(name = "page", required = true),
                     @Parameter(name = "size", required = true),
                     @Parameter(name = "name", required = false),
-                    @Parameter(name = "skuCode", required = false),
+                    @Parameter(name = "code", required = false),
+                    @Parameter(name = "barcode", required = false),
                     @Parameter(name = "stock", required = false),
-                    @Parameter(name = "dateBegin", required = false),
-                    @Parameter(name = "dateEnd", required = false),
+                    @Parameter(name = "brand", required = false),
                     @Parameter(name = "deleted", required = false),
                     @Parameter(name = "enabled", required = false),
-                    @Parameter(name = "userId", required = false)
+                    @Parameter(name = "dateBegin", required = false),
+                    @Parameter(name = "dateEnd", required = false),
+                    @Parameter(name = "priceMin", required = false),
+                    @Parameter(name = "priceMax", required = false),
+                    @Parameter(name = "stockMin", required = false),
+                    @Parameter(name = "stockMax", required = false),
+                    @Parameter(name = "categoryId", required = false),
+                    @Parameter(name = "companyId", required = false),
+                    @Parameter(name = "userId", required = false),
             }
     )
     public ResponseEntity<CustomApiResponse<Page<ProductResponse>>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String name,
-            @RequestParam(required = false) String skuCode,
+            @RequestParam(required = false) String code,
+            @RequestParam(required = false) String barcode,
             @RequestParam(required = false) String stock,
-            @RequestParam(required = false) OffsetDateTime dateBegin,
-            @RequestParam(required = false) OffsetDateTime dateEnd,
+            @RequestParam(required = false) String brand,
             @RequestParam(required = false) Boolean deleted,
             @RequestParam(required = false) Boolean enabled,
+            @RequestParam(required = false) OffsetDateTime dateBegin,
+            @RequestParam(required = false) OffsetDateTime dateEnd,
+            @RequestParam(required = false) BigDecimal priceMin,
+            @RequestParam(required = false) BigDecimal priceMax,
+            @RequestParam(required = false) Integer stockMin,
+            @RequestParam(required = false) Integer stockMax,
+            @RequestParam(required = false) UUID categoryId,
+            @RequestParam(required = false) UUID companyId,
             @RequestParam(required = false) UUID userId,
             HttpServletRequest request
     ) {
         final Pageable pageable = PageRequest.of(page, size);
-        FilterProductDto filters = new FilterProductDto(name, skuCode, stock, dateBegin, dateEnd, deleted, enabled, userId);
+        FilterProductDto filters = new FilterProductDto(
+                dateBegin,
+                dateEnd,
+                name,
+                code,
+                stock,
+                brand,
+                barcode,
+                deleted,
+                enabled,
+                priceMin,
+                priceMax,
+                stockMin,
+                stockMax,
+                categoryId,
+                companyId,
+                userId
+        );
         Page<ProductResponse> products = productService.getAllProducts(pageable, filters);
         CustomApiResponse<Page<ProductResponse>> response = new CustomApiResponse<>(
                 HttpStatus.OK.value(),

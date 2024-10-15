@@ -23,10 +23,19 @@ public class ProductService {
     public ProductResponse createProduct(ProductRequest productRequest) {
         Product product = Product.builder()
                 .name(productRequest.getName())
-                .description(productRequest.getDescription())
-                .skuCode(productRequest.getSkuCode())
-                .price(BigDecimal.valueOf(productRequest.getPrice()))
+                .slug(productRequest.getName().toLowerCase().replace(" ", "-"))
+                .barcode(productRequest.getBarcode())
+                .code(productRequest.getCode())
+                .price(productRequest.getPrice())
                 .stock(productRequest.getStock())
+                .brand(productRequest.getBrand())
+                .description(productRequest.getDescription())
+                .userId(productRequest.getUserId())
+                .companyId(productRequest.getCompanyId())
+                .categoryId(productRequest.getCategoryId())
+                .createdAt(productRequest.getCreatedAt())
+                .deleted(false)
+                .createdUser("JUAN LOPEZ")
                 .build();
         Product savedProduct = productRepository.save(product);
         return mapToProductResponse(savedProduct);
@@ -50,8 +59,15 @@ public class ProductService {
     public ProductResponse updateProduct(UUID id, UpdateProductDto updateProductDto) {
         Product product = productRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", id));
+        product.setUserId(updateProductDto.getUserId());
+        product.setCategoryId(updateProductDto.getCategoryId());
+        product.setCompanyId(updateProductDto.getCompanyId());
         product.setName(updateProductDto.getName());
         product.setSlug(updateProductDto.getName().toLowerCase().replace(" ", "-"));
+        product.setCode(updateProductDto.getCode());
+        product.setPrice(updateProductDto.getPrice());
+        product.setStock(updateProductDto.getStock());
+        product.setBrand(updateProductDto.getBrand());
         product.setDescription(updateProductDto.getDescription());
         product.setUpdatedAt(updateProductDto.getUpdatedAt());
         product.setUpdatedUser("MARIA PEREZ");
@@ -69,11 +85,24 @@ public class ProductService {
     private ProductResponse mapToProductResponse(Product product) {
         return ProductResponse.builder()
                 .id(product.getId())
-                .stock(product.getStock())
-                .skuCode(product.getSkuCode())
-                .description(product.getDescription())
-                .price(product.getPrice().doubleValue())
                 .name(product.getName())
+                .userId(product.getUserId())
+                .categoryId(product.getCategoryId())
+                .companyId(product.getCompanyId())
+                .slug(product.getSlug())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .stock(product.getStock())
+                .brand(product.getBrand())
+                .code(product.getCode())
+                .barcode(product.getBarcode())
+                .enabled(product.getEnabled())
+                .disabledReason(product.getDisabledReason())
+                .deleted(product.getDeleted())
+                .createdAt(product.getCreatedAt())
+                .createdUser(product.getCreatedUser())
+                .updatedAt(product.getUpdatedAt())
+                .updatedUser(product.getUpdatedUser())
                 .build();
     }
 

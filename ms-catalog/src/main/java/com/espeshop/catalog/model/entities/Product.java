@@ -2,8 +2,11 @@ package com.espeshop.catalog.model.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
+
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "product")
@@ -14,8 +17,17 @@ import java.time.OffsetDateTime;
 @Builder
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @UuidGenerator
+    private UUID id;
+
+    @Column(name = "user_id", nullable = false, columnDefinition = "UUID")
+    private UUID userId;
+
+    @Column(name = "category_id", nullable = false, columnDefinition = "UUID")
+    private UUID categoryId;
+
+    @Column(name = "company_id", nullable = false, columnDefinition = "UUID")
+    private UUID companyId;
 
     @Column(nullable = false)
     private String name;
@@ -23,17 +35,23 @@ public class Product {
     @Column(nullable = false)
     private String slug;
 
-    @Column(columnDefinition = "TEXT")
-    private String description;
+    @Column(name = "brand", nullable = false, length = 100)
+    private String brand;
 
-    @Column
-    private String skuCode;
-
-    @Column(nullable = false)
+    @Column(name = "price", nullable = false)
     private BigDecimal price;
 
-    @Column
+    @Column(name = "stock")
     private Integer stock;
+
+    @Column(name = "description", columnDefinition = "TEXT")
+    private String description;
+
+    @Column(name = "code", length = 255)
+    private String code;
+
+    @Column(name = "barcode", length = 255, unique = true)
+    private String barcode;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT NULL")
     private Boolean enabled;
