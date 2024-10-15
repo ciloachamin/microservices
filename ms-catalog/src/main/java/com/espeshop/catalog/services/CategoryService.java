@@ -7,15 +7,10 @@ import com.espeshop.catalog.model.dtos.FilterCategoryDto;
 import com.espeshop.catalog.model.dtos.UpdateCategoryDto;
 import com.espeshop.catalog.model.entities.Category;
 import com.espeshop.catalog.dao.repositories.CategoryRepository;
-import com.espeshop.catalog.model.entities.Product;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -42,14 +37,12 @@ public class CategoryService {
     }
 
     public List<CategoryResponse> getAllCategories(FilterCategoryDto filters) {
-        log.info("Filters: {}", filters);
+//        log.info("Filters: {}", filters);
         List<Category> categories;
-
         if (filters == null || filters.isEmpty()) {
             categories = categoryRepository.findAll();
         } else {
-            // Si hay algún filtro, llamar al método con filtros
-            categories = categoryRepository.findAllCategorys(filters);
+            categories = categoryRepository.findAllCategories(filters);
         }
         return categories.stream()
                 .map(this::mapToCategoryResponse)

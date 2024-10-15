@@ -16,7 +16,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,10 +40,12 @@ public class ProductExtendedRepositoryImpl implements ProductExtendedRepository 
             Predicate namePredicate = cb.like(root.get("name"), "%" + filters.getName() + "%");
             predicates.add(namePredicate);
         }
+
         if (filters.getSkuCode() != null) {
             Predicate skuCodePredicate = cb.like(root.get("skuCode"), "%" + filters.getSkuCode() + "%");
             predicates.add(skuCodePredicate);
         }
+
         if (filters.getStock() != null) {
             Predicate stokePredicate = cb.like(root.get("stock"), filters.getStock());
             predicates.add(stokePredicate);
@@ -60,6 +61,7 @@ public class ProductExtendedRepositoryImpl implements ProductExtendedRepository 
             Predicate dateEndPredicate = cb.lessThanOrEqualTo(root.get("createdAt"), filters.getDateEnd());
             predicates.add(dateEndPredicate);
         }
+
         if (filters.getDeleted() != null) {
             predicates.add(cb.equal(root.get("deleted"), filters.getDeleted()));
         }
@@ -71,6 +73,7 @@ public class ProductExtendedRepositoryImpl implements ProductExtendedRepository 
         if (filters.getUserId() != null) {
             predicates.add(cb.equal(root.get("userId"), filters.getUserId()));
         }
+
         query.where(
                 cb.and(predicates.toArray(new Predicate[0]))
         );
@@ -78,6 +81,5 @@ public class ProductExtendedRepositoryImpl implements ProductExtendedRepository 
         TypedQuery<Product> typedQuery = entityManager.createQuery(query);
 
         return new PageImpl<>(typedQuery.getResultList(), pageable, typedQuery.getResultList().size());
-
     }
 }

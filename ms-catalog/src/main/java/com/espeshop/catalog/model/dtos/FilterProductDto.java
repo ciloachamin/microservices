@@ -3,8 +3,8 @@ package com.espeshop.catalog.model.dtos;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Data
 @AllArgsConstructor
@@ -17,7 +17,7 @@ public class FilterProductDto {
     private OffsetDateTime dateEnd;
     private Boolean deleted;
     private Boolean enabled;
-    private String userId;
+    private UUID userId;
 
     public boolean isEmpty() {
         return (name == null || name.isEmpty()) &&
@@ -27,7 +27,7 @@ public class FilterProductDto {
                 dateEnd == null &&
                 deleted == null &&
                 enabled == null &&
-                (userId == null || userId.isEmpty())
+                userId == null
                 ;
     }
 }

@@ -2,8 +2,8 @@ package com.espeshop.catalog.model.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.math.BigDecimal;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "product")
@@ -20,6 +20,9 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
+    private String slug;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -31,6 +34,27 @@ public class Product {
 
     @Column
     private Integer stock;
+
+    @Column(columnDefinition = "BOOLEAN DEFAULT NULL")
+    private Boolean enabled;
+
+    @Column(columnDefinition = "TEXT")
+    private String disabledReason;
+
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean deleted = false;
+
+    @Column(nullable = false)
+    private OffsetDateTime createdAt;
+
+    @Column(nullable = false)
+    private String createdUser;
+
+    @Column
+    private OffsetDateTime updatedAt;
+
+    @Column
+    private String updatedUser;
 
     @Override
     public String toString() {

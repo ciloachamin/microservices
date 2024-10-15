@@ -13,15 +13,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Category", description = "Operations related to categories")
 public class CategoryController {
+
     private final CategoryService categoryService;
 
     @PostMapping("/category")
@@ -56,7 +57,6 @@ public class CategoryController {
                     @Parameter(name = "deleted", required = false),
                     @Parameter(name = "enabled", required = false),
                     @Parameter(name = "userId", required = false)
-
             }
     )
     public ResponseEntity<CustomApiResponse<List<CategoryResponse>>> getAllCategories(
@@ -64,12 +64,11 @@ public class CategoryController {
             @RequestParam(required = false) UUID parentCategoryId,
             @RequestParam(required = false) Boolean deleted,
             @RequestParam(required = false) Boolean enabled,
-            @RequestParam(required = false) String userId,
+            @RequestParam(required = false) UUID userId,
             HttpServletRequest request
     ) {
         FilterCategoryDto filters = new FilterCategoryDto(name, parentCategoryId, deleted, enabled, userId);
         List<CategoryResponse> categories = categoryService.getAllCategories(filters);
-
         CustomApiResponse<List<CategoryResponse>> response = new CustomApiResponse<>(
                 HttpStatus.OK.value(),
                 true,
@@ -78,7 +77,6 @@ public class CategoryController {
                 LocalDateTime.now(),
                 categories
         );
-
         return ResponseEntity.ok(response);
     }
 

@@ -13,7 +13,6 @@ import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Repository;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class CategoryExtendedRepositoryImpl implements CategoryExtendedRepositor
     private EntityManager entityManager;
 
     @Override
-    public List<Category> findAllCategorys(FilterCategoryDto filters) {
+    public List<Category> findAllCategories(FilterCategoryDto filters) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Category> query = cb.createQuery(Category.class);
         // SELECT * FROM Category

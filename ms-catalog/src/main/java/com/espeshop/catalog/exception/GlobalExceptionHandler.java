@@ -23,30 +23,25 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleInvalidArgument(MethodArgumentNotValidException ex) {
-        log.info("Excepción de validación capturada: {}", ex);
 
-        // Mapa para almacenar los errores de validación
         Map<String, String> errorMap = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error -> {
             log.error("Campo con error: {}, mensaje: {}", error.getField(), error.getDefaultMessage());
             errorMap.put(error.getField(), error.getDefaultMessage());
         });
 
-        // Crear una instancia de ErrorResponse
         ErrorResponse errorResponse = new ErrorResponse(
-                HttpStatus.BAD_REQUEST.value(),          // Código de error (400)
-                "Validation failed",                     // Mensaje general
-                LocalDateTime.now(),                     // Timestamp
-                errorMap                                 // Detalles de los campos que fallaron
+                HttpStatus.BAD_REQUEST.value(),
+                "Validation failed",
+                LocalDateTime.now(),
+                errorMap
         );
 
-        // Devolver la respuesta con el objeto ErrorResponse
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<CustomApiResponse> handlerResourceNotFoundException(ResourceNotFoundException exception,
-                                                                                          WebRequest webRequest) {
+    public ResponseEntity<CustomApiResponse> handlerResourceNotFoundException(ResourceNotFoundException exception, WebRequest webRequest) {
         CustomApiResponse apiResponse = new CustomApiResponse(404, false, exception.getMessage(), webRequest.getDescription(false),LocalDateTime.now(), null);
         return new ResponseEntity<>(apiResponse, HttpStatus.NOT_FOUND);
     }

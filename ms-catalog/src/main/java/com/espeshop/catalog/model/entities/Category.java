@@ -2,7 +2,6 @@ package com.espeshop.catalog.model.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.OffsetDateTime;
@@ -37,7 +36,6 @@ public class Category {
 
     @Column(columnDefinition = "BOOLEAN DEFAULT NULL")
     private Boolean enabled;
-
 
     @Column(columnDefinition = "TEXT")
     private String disabledReason;

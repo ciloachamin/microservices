@@ -1,17 +1,12 @@
 package com.espeshop.catalog.controllers.v1;
 
-import com.espeshop.catalog.model.dtos.CustomApiResponse;
-import com.espeshop.catalog.model.dtos.FilterProductDto;
-import com.espeshop.catalog.model.dtos.ProductRequest;
-import com.espeshop.catalog.model.dtos.ProductResponse;
+import com.espeshop.catalog.model.dtos.*;
 import com.espeshop.catalog.model.entities.Product;
 import com.espeshop.catalog.services.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,15 +16,16 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
 @Tag(name = "Product", description = "Operations related to products")
 public class ProductController {
+
     private final ProductService productService;
 
     @PostMapping("/product")
@@ -39,18 +35,16 @@ public class ProductController {
             summary = "Create a new product",
             description = "This endpoint allows administrators to create a new product. Only users with 'ROLE_ADMIN' can access this."
     )
-    public ResponseEntity<CustomApiResponse<ProductResponse>> createProduct(@RequestBody @Valid ProductRequest productRequest) {
+    public ResponseEntity<CustomApiResponse<ProductResponse>> createProduct(@RequestBody @Valid ProductRequest productRequest , HttpServletRequest request) {
         ProductResponse createdProduct = productService.createProduct(productRequest);
-
         CustomApiResponse<ProductResponse> response = new CustomApiResponse<>(
                 HttpStatus.CREATED.value(),
                 true,
                 "Product created successfully",
-                "hol/",
+                request.getRequestURI(),
                 LocalDateTime.now(),
                 createdProduct
         );
-
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -61,13 +55,6 @@ public class ProductController {
     @Operation(
             summary = "Get all products",
             description = "Retrieve a list of all products. You can optionally filter by name.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Products retrieved successfully",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = ProductResponse.class))),
-                    @ApiResponse(responseCode = "400", description = "Invalid parameters supplied"),
-                    @ApiResponse(responseCode = "500", description = "Internal server error")
-            },
             parameters = {
                     @Parameter(name = "page", required = true),
                     @Parameter(name = "size", required = true),
@@ -91,21 +78,20 @@ public class ProductController {
             @RequestParam(required = false) OffsetDateTime dateEnd,
             @RequestParam(required = false) Boolean deleted,
             @RequestParam(required = false) Boolean enabled,
-            @RequestParam(required = false) String userId
+            @RequestParam(required = false) UUID userId,
+            HttpServletRequest request
     ) {
         final Pageable pageable = PageRequest.of(page, size);
         FilterProductDto filters = new FilterProductDto(name, skuCode, stock, dateBegin, dateEnd, deleted, enabled, userId);
         Page<ProductResponse> products = productService.getAllProducts(pageable, filters);
-
         CustomApiResponse<Page<ProductResponse>> response = new CustomApiResponse<>(
                 HttpStatus.OK.value(),
                 true,
                 "Products retrieved successfully",
-                "hol/",
+                request.getRequestURI(),
                 LocalDateTime.now(),
                 products
         );
-
         return ResponseEntity.ok(response);
     }
 
@@ -114,28 +100,22 @@ public class ProductController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(
             summary = "Update an existing product",
-            description = "This endpoint allows administrators to update an existing product. Only users with 'ROLE_ADMIN' can access this.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Product updated successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
-                    @ApiResponse(responseCode = "404", description = "Product not found"),
-                    @ApiResponse(responseCode = "403", description = "Access denied")
-            }
+            description = "This endpoint allows administrators to update an existing product. Only users with 'ROLE_ADMIN' can access this."
     )
     public ResponseEntity<CustomApiResponse<ProductResponse>> updateProduct(
-            @PathVariable Long id,
-            @RequestBody @Valid ProductRequest productRequest) {
-        ProductResponse updatedProduct = productService.updateProduct(id,productRequest);
-
+            @PathVariable UUID id,
+            @RequestBody @Valid UpdateProductDto updateProductDto,
+            HttpServletRequest request
+    ) {
+        ProductResponse updatedProduct = productService.updateProduct(id,updateProductDto);
         CustomApiResponse<ProductResponse> response = new CustomApiResponse<>(
                 HttpStatus.CREATED.value(),
                 true,
-                "Product created successfully",
-                "hol/",
+                "Product updated successfully",
+                request.getRequestURI(),
                 LocalDateTime.now(),
                 updatedProduct
         );
-
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -144,16 +124,21 @@ public class ProductController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(
             summary = "Delete a product",
-            description = "This endpoint allows administrators to delete a product. Only users with 'ROLE_ADMIN' can access this.",
-            responses = {
-                    @ApiResponse(responseCode = "204", description = "Product deleted successfully"),
-                    @ApiResponse(responseCode = "404", description = "Product not found"),
-                    @ApiResponse(responseCode = "403", description = "Access denied")
-            }
+            description = "This endpoint allows administrators to delete a product. Only users with 'ROLE_ADMIN' can access this."
     )
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        productService.deleteProduct(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<CustomApiResponse<ProductResponse>> deleteProduct(
+            @PathVariable UUID id,
+            HttpServletRequest request) {
+        ProductResponse deletedProduct = productService.deleteProduct(id);
+        CustomApiResponse<ProductResponse> response = new CustomApiResponse<>(
+                HttpStatus.OK.value(),
+                true,
+                "Product deleted successfully",
+                request.getRequestURI(),
+                LocalDateTime.now(),
+                deletedProduct
+        );
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("product/{id}")
@@ -161,17 +146,20 @@ public class ProductController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
             summary = "Get product by ID",
-            description = "Retrieve a product by its ID.",
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Product retrieved successfully",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = ProductResponse.class))),
-                    @ApiResponse(responseCode = "404", description = "Product not found"),
-                    @ApiResponse(responseCode = "403", description = "Access denied")
-            }
+            description = "Retrieve a product by its ID."
     )
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<CustomApiResponse<Product>> getProductById(
+            @PathVariable UUID id,
+            HttpServletRequest request) {
         Product productResponse = productService.getProductById(id);
-        return ResponseEntity.ok(productResponse);
+        CustomApiResponse<Product> response = new CustomApiResponse<>(
+                HttpStatus.OK.value(),
+                true,
+                "Product retrieved successfully",
+                request.getRequestURI(),
+                LocalDateTime.now(),
+                productResponse
+        );
+        return ResponseEntity.ok(response);
     }
 }
