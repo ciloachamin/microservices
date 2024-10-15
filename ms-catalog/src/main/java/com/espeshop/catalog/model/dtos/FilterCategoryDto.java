@@ -4,26 +4,22 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ProductFiltersDto {
+public class FilterCategoryDto {
     private String name;
-    private String skuCode;
-    private String stock;
-    private Long dateBegin;
-    private Long dateEnd;
-    private String deleted;
+    private UUID parentCategoryId;
+    private Boolean deleted;
     private Boolean enabled;
     private String userId;
 
     public boolean isEmpty() {
         return (name == null || name.isEmpty()) &&
-                (skuCode == null || skuCode.isEmpty()) &&
-                (stock == null || stock.isEmpty()) &&
-                dateBegin == null &&
-                dateEnd == null &&
-                (deleted == null || deleted.isEmpty()) &&
+                parentCategoryId == null &&
+                deleted == null &&
                 enabled == null &&
                 (userId == null || userId.isEmpty())
                 ;

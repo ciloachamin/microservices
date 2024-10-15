@@ -1,6 +1,7 @@
 package com.espeshop.catalog.services;
 
-import com.espeshop.catalog.model.dtos.ProductFiltersDto;
+import com.espeshop.catalog.exception.ResourceNotFoundException;
+import com.espeshop.catalog.model.dtos.FilterProductDto;
 import com.espeshop.catalog.model.dtos.ProductRequest;
 import com.espeshop.catalog.model.dtos.ProductResponse;
 import com.espeshop.catalog.model.entities.Product;
@@ -20,7 +21,7 @@ public class ProductService {
     private final ProductRepository productRepository;
 
 
-    public Product createProduct(ProductRequest productRequest) {
+    public ProductResponse createProduct(ProductRequest productRequest) {
         Product product = Product.builder()
                 .name(productRequest.getName())
                 .description(productRequest.getDescription())
@@ -28,21 +29,53 @@ public class ProductService {
                 .price(BigDecimal.valueOf(productRequest.getPrice()))
                 .stock(productRequest.getStock())
                 .build();
-        return  productRepository.save(product);
+
+        Product savedProduct = productRepository.save(product);
+        return mapToProductResponse(savedProduct);  // Convierte el producto a ProductResponse antes de devolverlo
     }
 
-    public Page<Product> getAllProducts(Pageable pageable, ProductFiltersDto filters) {
+    public Page<ProductResponse> getAllProducts(Pageable pageable, FilterProductDto filters) {
         log.info("Pageable: {}", pageable);
         log.info("Filters: {}", filters);
+
+        Page<Product> products;
 
         // Verificar si el objeto filters es nulo o está vacío
         if (filters == null || filters.isEmpty()) {
             // Si no hay filtros, devolver todos los productos
-            return productRepository.findAll(pageable);
+            products = productRepository.findAll(pageable);
+        } else {
+            // Si hay algún filtro, llamar al método con filtros
+            products = productRepository.findAllProducts(pageable, filters);
         }
 
-        // Si hay algún filtro, llamar al método con filtros
-        return productRepository.findAllProducts(pageable, filters);
+        // Mapear cada Product a ProductResponse
+        return products.map(this::mapToProductResponse);
+    }
+
+
+
+    public Product getProductById(Long id) {
+        return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product","id",id));
+    }
+
+    public ProductResponse updateProduct(Long id, ProductRequest productRequest) {
+        Product product = productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+
+         product = Product.builder()
+                .name(productRequest.getName())
+                .description(productRequest.getDescription())
+                .skuCode(productRequest.getSkuCode())
+                .price(BigDecimal.valueOf(productRequest.getPrice()))
+                .stock(productRequest.getStock())
+                .build();
+
+        Product savedProduct = productRepository.save(product);
+        return mapToProductResponse(savedProduct);  // Convierte el producto a ProductResponse antes de devolverlo
+    }
+
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
     }
 
 
@@ -55,21 +88,6 @@ public class ProductService {
                 .price(product.getPrice().doubleValue())
                 .name(product.getName())
                 .build();
-    }
-
-    public Product getProductById(Long id) {
-        return productRepository.findById(id).orElse(null);
-    }
-
-    public ProductResponse updateProduct(Long id, ProductRequest productRequest) {
-        Product product = productRepository.findById(id).orElseThrow(() -> new RuntimeException("Product not found"));
-        // Update product properties from productRequest
-        productRepository.save(product);
-        return new ProductResponse(); // Convert Product entity to ProductResponse
-    }
-
-    public void deleteProduct(Long id) {
-        productRepository.deleteById(id);
     }
 
 }

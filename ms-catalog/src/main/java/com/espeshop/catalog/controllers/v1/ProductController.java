@@ -1,6 +1,7 @@
 package com.espeshop.catalog.controllers.v1;
 
-import com.espeshop.catalog.model.dtos.ProductFiltersDto;
+import com.espeshop.catalog.model.dtos.CustomApiResponse;
+import com.espeshop.catalog.model.dtos.FilterProductDto;
 import com.espeshop.catalog.model.dtos.ProductRequest;
 import com.espeshop.catalog.model.dtos.ProductResponse;
 import com.espeshop.catalog.model.entities.Product;
@@ -13,12 +14,16 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -32,16 +37,23 @@ public class ProductController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(
             summary = "Create a new product",
-            description = "This endpoint allows administrators to create a new product. Only users with 'ROLE_ADMIN' can access this.",
-            responses = {
-                    @ApiResponse(responseCode = "201", description = "Product created successfully"),
-                    @ApiResponse(responseCode = "400", description = "Invalid input data"),
-                    @ApiResponse(responseCode = "403", description = "Access denied")
-            }
+            description = "This endpoint allows administrators to create a new product. Only users with 'ROLE_ADMIN' can access this."
     )
-    public ResponseEntity<?> createProduct(@RequestBody @Valid ProductRequest productRequest) {
-        return new ResponseEntity<>(productService.createProduct(productRequest), HttpStatus.CREATED);
+    public ResponseEntity<CustomApiResponse<ProductResponse>> createProduct(@RequestBody @Valid ProductRequest productRequest) {
+        ProductResponse createdProduct = productService.createProduct(productRequest);
+
+        CustomApiResponse<ProductResponse> response = new CustomApiResponse<>(
+                HttpStatus.CREATED.value(),
+                true,
+                "Product created successfully",
+                "hol/",
+                LocalDateTime.now(),
+                createdProduct
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
 
     @GetMapping("/products")
     @ResponseStatus(HttpStatus.OK)
@@ -62,28 +74,39 @@ public class ProductController {
                     @Parameter(name = "name", required = false),
                     @Parameter(name = "skuCode", required = false),
                     @Parameter(name = "stock", required = false),
-                    @Parameter(name = "date_begin", required = false),
-                    @Parameter(name = "date_end", required = false),
+                    @Parameter(name = "dateBegin", required = false),
+                    @Parameter(name = "dateEnd", required = false),
                     @Parameter(name = "deleted", required = false),
                     @Parameter(name = "enabled", required = false),
-                    @Parameter(name = "user_id", required = false)
+                    @Parameter(name = "userId", required = false)
             }
     )
-    public ResponseEntity<?> getAllProducts(
+    public ResponseEntity<CustomApiResponse<Page<ProductResponse>>> getAllProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String skuCode,
             @RequestParam(required = false) String stock,
-            @RequestParam(required = false) Long dateBegin,
-            @RequestParam(required = false) Long dateEnd,
-            @RequestParam(required = false) String deleted,
+            @RequestParam(required = false) OffsetDateTime dateBegin,
+            @RequestParam(required = false) OffsetDateTime dateEnd,
+            @RequestParam(required = false) Boolean deleted,
             @RequestParam(required = false) Boolean enabled,
             @RequestParam(required = false) String userId
     ) {
         final Pageable pageable = PageRequest.of(page, size);
-        ProductFiltersDto filters = new ProductFiltersDto(name, skuCode, stock, dateBegin, dateEnd, deleted, enabled, userId);
-        return ResponseEntity.ok(productService.getAllProducts(pageable, filters));
+        FilterProductDto filters = new FilterProductDto(name, skuCode, stock, dateBegin, dateEnd, deleted, enabled, userId);
+        Page<ProductResponse> products = productService.getAllProducts(pageable, filters);
+
+        CustomApiResponse<Page<ProductResponse>> response = new CustomApiResponse<>(
+                HttpStatus.OK.value(),
+                true,
+                "Products retrieved successfully",
+                "hol/",
+                LocalDateTime.now(),
+                products
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("product/{id}")
@@ -99,11 +122,21 @@ public class ProductController {
                     @ApiResponse(responseCode = "403", description = "Access denied")
             }
     )
-    public ResponseEntity<ProductResponse> updateProduct(
+    public ResponseEntity<CustomApiResponse<ProductResponse>> updateProduct(
             @PathVariable Long id,
             @RequestBody @Valid ProductRequest productRequest) {
-        ProductResponse updatedProduct = productService.updateProduct(id, productRequest);
-        return ResponseEntity.ok(updatedProduct);
+        ProductResponse updatedProduct = productService.updateProduct(id,productRequest);
+
+        CustomApiResponse<ProductResponse> response = new CustomApiResponse<>(
+                HttpStatus.CREATED.value(),
+                true,
+                "Product created successfully",
+                "hol/",
+                LocalDateTime.now(),
+                updatedProduct
+        );
+
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @DeleteMapping("product/{id}")

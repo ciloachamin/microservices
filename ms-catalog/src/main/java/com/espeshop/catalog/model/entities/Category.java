@@ -18,7 +18,6 @@ import java.util.UUID;
 public class Category {
 
     @Id
-    @GeneratedValue
     @UuidGenerator
     private UUID id;
 
@@ -36,14 +35,15 @@ public class Category {
     @Column(columnDefinition = "TEXT")
     private String image;
 
-    @Column(nullable = false)
-    private boolean enabled = true;
+    @Column(columnDefinition = "BOOLEAN DEFAULT NULL")
+    private Boolean enabled;
+
 
     @Column(columnDefinition = "TEXT")
     private String disabledReason;
 
-    @Column(nullable = false)
-    private boolean deleted = false;
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
+    private Boolean deleted = false;
 
     @Column(nullable = false)
     private OffsetDateTime createdAt;

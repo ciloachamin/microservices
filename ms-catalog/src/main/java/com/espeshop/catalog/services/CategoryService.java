@@ -1,16 +1,23 @@
 package com.espeshop.catalog.services;
 
+import com.espeshop.catalog.exception.ResourceNotFoundException;
 import com.espeshop.catalog.model.dtos.CategoryRequest;
 import com.espeshop.catalog.model.dtos.CategoryResponse;
+import com.espeshop.catalog.model.dtos.FilterCategoryDto;
+import com.espeshop.catalog.model.dtos.UpdateCategoryDto;
 import com.espeshop.catalog.model.entities.Category;
 import com.espeshop.catalog.dao.repositories.CategoryRepository;
+import com.espeshop.catalog.model.entities.Product;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -18,70 +25,81 @@ import java.util.UUID;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
 
-    public Category createCategory(CategoryRequest categoryRequest) {
+    public CategoryResponse createCategory(CategoryRequest categoryRequest) {
         Category category = Category.builder()
                 .name(categoryRequest.getName())
-                .slug(categoryRequest.getName().toLowerCase().replace(" ", "-"))
-                .parentCategoryId(UUID.fromString(categoryRequest.getParentCategoryId()))
-                .disabledReason(categoryRequest.getDisabledReason())
-                .deleted(categoryRequest.isDeleted())
-                .createdAt(categoryRequest.getCreatedAt())
-                .createdUser(categoryRequest.getCreatedUser())
-                .updatedAt(categoryRequest.getUpdatedAt())
-                .updatedUser(categoryRequest.getUpdatedUser())
                 .description(categoryRequest.getDescription())
                 .image(categoryRequest.getImage())
-                .enabled(categoryRequest.getEnabled())
+                .slug(categoryRequest.getName().toLowerCase().replace(" ", "-"))
+                .parentCategoryId(categoryRequest.getParentCategoryId())
+                .createdAt(categoryRequest.getCreatedAt())
+                .deleted(false)
+                .createdUser("JUAN LOPEZ")
                 .build();
-        return categoryRepository.save(category);
+        Category savedCategory = categoryRepository.save(category);
+        return mapToCategoryResponse(savedCategory);
+
     }
 
-    public Page<Category> getAllCategories(Pageable pageable) {
-        log.info("Retrieving all categories with pageable: {}", pageable);
-        return categoryRepository.findAll(pageable);
+    public List<CategoryResponse> getAllCategories(FilterCategoryDto filters) {
+        log.info("Filters: {}", filters);
+        List<Category> categories;
+
+        if (filters == null || filters.isEmpty()) {
+            categories = categoryRepository.findAll();
+        } else {
+            // Si hay algún filtro, llamar al método con filtros
+            categories = categoryRepository.findAllCategorys(filters);
+        }
+        return categories.stream()
+                .map(this::mapToCategoryResponse)
+                .collect(Collectors.toList());
     }
 
     public Category getCategoryById(UUID id) {
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
+        return categoryRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
     }
 
-    public CategoryResponse updateCategory(UUID id, CategoryRequest categoryRequest) {
-        Category category = categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found"));
-
-        // Update category properties from categoryRequest
-        category.setName(categoryRequest.getName());
-        category.setDescription(categoryRequest.getDescription());
-        category.setImage(categoryRequest.getImage());
-        category.setEnabled(categoryRequest.getEnabled());
-
+    public CategoryResponse updateCategory(UUID id, UpdateCategoryDto updateCategoryDto) {
+        Category category = categoryRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
+        category.setName(updateCategoryDto.getName());
+        category.setSlug(updateCategoryDto.getName().toLowerCase().replace(" ", "-"));
+        category.setDescription(updateCategoryDto.getDescription());
+        category.setImage(updateCategoryDto.getImage());
+        category.setParentCategoryId(UUID.fromString(updateCategoryDto.getParentCategoryId()));
+        category.setUpdatedAt(updateCategoryDto.getUpdatedAt());
+        category.setUpdatedUser("MARIA PEREZ");
         categoryRepository.save(category);
         return mapToCategoryResponse(category);
     }
 
-    public void deleteCategory(UUID id) {
-        categoryRepository.deleteById(id);
+    public CategoryResponse deleteCategory(UUID id) {
+        Category category = categoryRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
+        category.setDeleted(true);
+        Category savedCategory = categoryRepository.save(category);
+        return mapToCategoryResponse(savedCategory);
     }
 
     private CategoryResponse mapToCategoryResponse(Category category) {
         return CategoryResponse.builder()
                 .id(category.getId())
-                .parentCategoryId(category.getParentCategoryId())
+                .parentCategoryId(UUID.fromString(String.valueOf(category.getParentCategoryId())))
                 .slug(category.getSlug())
                 .disabledReason(category.getDisabledReason())
-                .deleted(category.isDeleted())
+                .deleted(category.getDeleted())
                 .createdAt(category.getCreatedAt())
                 .createdUser(category.getCreatedUser())
                 .updatedAt(category.getUpdatedAt())
                 .updatedUser(category.getUpdatedUser())
                 .description(category.getDescription())
-                .enabled(category.isEnabled())
+                .enabled(category.getEnabled())
                 .image(category.getImage())
                 .name(category.getName())
                 .description(category.getDescription())
                 .image(category.getImage())
-                .enabled(category.isEnabled())
                 .build();
     }
 }
