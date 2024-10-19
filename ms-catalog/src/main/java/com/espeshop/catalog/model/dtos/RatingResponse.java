@@ -7,27 +7,20 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ProductResponse {
+public class RatingResponse {
     private UUID id;
     private UUID userId;
-    private UUID categoryId;
-    private UUID companyId;
+    private UUID productId;
     private String name;
-    private String slug;
-    private String brand;
-    private BigDecimal price;
-    private Integer stock;
-    private String description;
-    private String code;
-    private String barcode;
+    private Integer rating;
+    private String comment;
+    private OffsetDateTime publishDate;
     private Boolean enabled;
     private String disabledReason;
     private Boolean deleted;
@@ -35,8 +28,4 @@ public class ProductResponse {
     private String createdUser;
     private OffsetDateTime updatedAt;
     private String updatedUser;
-
-    private Set<ImageResponse> images;
-
-
 }

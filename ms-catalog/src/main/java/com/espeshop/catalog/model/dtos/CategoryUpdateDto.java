@@ -14,7 +14,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpdateCategoryDto {
+public class CategoryUpdateDto {
     @Schema(example = "Alimentos", description = "Nombre de la categoría")
     @NotBlank(message = "El campo 'name' no puede estar vacío")
     @Size(max = 50, message = "El campo 'name' debe tener un máximo de 50 caracteres")

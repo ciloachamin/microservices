@@ -67,7 +67,7 @@ public class CategoryController {
             @RequestParam(required = false) UUID userId,
             HttpServletRequest request
     ) {
-        FilterCategoryDto filters = new FilterCategoryDto(name, parentCategoryId, deleted, enabled, userId);
+        CategoryFilterDto filters = new CategoryFilterDto(name, parentCategoryId, deleted, enabled, userId);
         List<CategoryResponse> categories = categoryService.getAllCategories(filters);
         CustomApiResponse<List<CategoryResponse>> response = new CustomApiResponse<>(
                 HttpStatus.OK.value(),
@@ -111,9 +111,9 @@ public class CategoryController {
     )
     public ResponseEntity<CustomApiResponse<CategoryResponse>> updateCategory(
             @PathVariable UUID id,
-            @RequestBody @Valid UpdateCategoryDto updateCategoryDto,
+            @RequestBody @Valid CategoryUpdateDto categoryUpdateDto,
             HttpServletRequest request) {
-        CategoryResponse updatedCategory = categoryService.updateCategory(id, updateCategoryDto);
+        CategoryResponse updatedCategory = categoryService.updateCategory(id, categoryUpdateDto);
         CustomApiResponse<CategoryResponse> response = new CustomApiResponse<>(
                 HttpStatus.OK.value(),
                 true,

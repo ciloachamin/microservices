@@ -1,7 +1,7 @@
 package com.espeshop.catalog.dao.extended.implement;
 
 import com.espeshop.catalog.dao.extended.ProductExtendedRepository;
-import com.espeshop.catalog.model.dtos.FilterProductDto;
+import com.espeshop.catalog.model.dtos.ProductFilterDto;
 import com.espeshop.catalog.model.entities.Product;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -28,7 +28,7 @@ public class ProductExtendedRepositoryImpl implements ProductExtendedRepository 
     private EntityManager entityManager;
 
     @Override
-    public Page<Product> findAllProducts(Pageable pageable, FilterProductDto filters) {
+    public Page<Product> findAllProducts(Pageable pageable, ProductFilterDto filters) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Product> query = cb.createQuery(Product.class);
         //SELECT * FROM product
@@ -42,8 +42,8 @@ public class ProductExtendedRepositoryImpl implements ProductExtendedRepository 
         }
 
         if (filters.getCode() != null) {
-            Predicate skuCodePredicate = cb.like(root.get("skuCode"), "%" + filters.getCode() + "%");
-            predicates.add(skuCodePredicate);
+            Predicate codePredicate = cb.like(root.get("code"), "%" + filters.getCode() + "%");
+            predicates.add(codePredicate);
         }
 
         if (filters.getStock() != null) {

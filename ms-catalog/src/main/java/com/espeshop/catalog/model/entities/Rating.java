@@ -8,24 +8,29 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "images")
+@Table(name = "ratings")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Image {
+public class Rating {
 
     @Id
     @UuidGenerator
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @Column(nullable = false, columnDefinition = "UUID")
+    private UUID userId;
+
+    @Column(nullable = false)
+    private Integer rating;
 
     @Column(columnDefinition = "TEXT")
-    private String imageUrl;
+    private String comment;
+
+    @Column
+    private OffsetDateTime publishDate;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT NULL")
     private Boolean enabled;
@@ -47,4 +52,14 @@ public class Image {
 
     @Column
     private String updatedUser;
+
+    // Relación con la entidad Product
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", insertable = false, updatable = false)
+    private Product product; // Relación con la entidad Product
+
+//    // Relación con la entidad User
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+//    private User user; // Relación con la entidad Use
 }

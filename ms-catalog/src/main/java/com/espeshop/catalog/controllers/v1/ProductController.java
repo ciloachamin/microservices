@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -100,7 +102,7 @@ public class ProductController {
             HttpServletRequest request
     ) {
         final Pageable pageable = PageRequest.of(page, size);
-        FilterProductDto filters = new FilterProductDto(
+        ProductFilterDto filters = new ProductFilterDto(
                 dateBegin,
                 dateEnd,
                 name,
@@ -139,10 +141,10 @@ public class ProductController {
     )
     public ResponseEntity<CustomApiResponse<ProductResponse>> updateProduct(
             @PathVariable UUID id,
-            @RequestBody @Valid UpdateProductDto updateProductDto,
+            @RequestBody @Valid ProductUpdateDto productUpdateDto,
             HttpServletRequest request
     ) {
-        ProductResponse updatedProduct = productService.updateProduct(id,updateProductDto);
+        ProductResponse updatedProduct = productService.updateProduct(id, productUpdateDto);
         CustomApiResponse<ProductResponse> response = new CustomApiResponse<>(
                 HttpStatus.CREATED.value(),
                 true,
@@ -183,11 +185,20 @@ public class ProductController {
             summary = "Get product by ID",
             description = "Retrieve a product by its ID."
     )
-    public ResponseEntity<CustomApiResponse<Product>> getProductById(
+    public ResponseEntity<CustomApiResponse<ProductResponse>> getProductById(
             @PathVariable UUID id,
             HttpServletRequest request) {
-        Product productResponse = productService.getProductById(id);
-        CustomApiResponse<Product> response = new CustomApiResponse<>(
+        ProductResponse productResponse = productService.getProductByIds(id);
+        Set<ImageResponse> images = productResponse.getImages().stream()
+                .map(image -> ImageResponse.builder()
+                        .id(image.getId())
+                        .imageUrl(image.getImageUrl())
+                        .createdAt(image.getCreatedAt())
+                        .createdUser(image.getCreatedUser())
+                        .build())
+                .collect(Collectors.toSet());
+
+        CustomApiResponse<ProductResponse> response = new CustomApiResponse<>(
                 HttpStatus.OK.value(),
                 true,
                 "Product retrieved successfully",

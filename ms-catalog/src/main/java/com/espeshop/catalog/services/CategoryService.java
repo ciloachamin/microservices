@@ -3,14 +3,15 @@ package com.espeshop.catalog.services;
 import com.espeshop.catalog.exception.ResourceNotFoundException;
 import com.espeshop.catalog.model.dtos.CategoryRequest;
 import com.espeshop.catalog.model.dtos.CategoryResponse;
-import com.espeshop.catalog.model.dtos.FilterCategoryDto;
-import com.espeshop.catalog.model.dtos.UpdateCategoryDto;
+import com.espeshop.catalog.model.dtos.CategoryFilterDto;
+import com.espeshop.catalog.model.dtos.CategoryUpdateDto;
 import com.espeshop.catalog.model.entities.Category;
 import com.espeshop.catalog.dao.repositories.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -26,17 +27,27 @@ public class CategoryService {
                 .description(categoryRequest.getDescription())
                 .image(categoryRequest.getImage())
                 .slug(categoryRequest.getName().toLowerCase().replace(" ", "-"))
-                .parentCategoryId(categoryRequest.getParentCategoryId())
                 .createdAt(categoryRequest.getCreatedAt())
                 .deleted(false)
                 .createdUser("JUAN LOPEZ")
                 .build();
+        // Si hay un ID de categoría padre, buscar y establecer la categoría padre
+        if (categoryRequest.getParentCategoryId() != null) {
+            Optional<Category> parentCategoryOptional = categoryRepository.findById(categoryRequest.getParentCategoryId());
+            parentCategoryOptional.ifPresent(category::setParentCategory);
+        }
+
+        if (categoryRequest.getParentCategoryId() != null) {
+            Category parentCategory = categoryRepository.findById(categoryRequest.getParentCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", "parentCategoryId", categoryRequest.getParentCategoryId()));
+            category.setParentCategory(parentCategory);
+        }
         Category savedCategory = categoryRepository.save(category);
         return mapToCategoryResponse(savedCategory);
 
     }
 
-    public List<CategoryResponse> getAllCategories(FilterCategoryDto filters) {
+    public List<CategoryResponse> getAllCategories(CategoryFilterDto filters) {
 //        log.info("Filters: {}", filters);
         List<Category> categories;
         if (filters == null || filters.isEmpty()) {
@@ -54,16 +65,23 @@ public class CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
     }
 
-    public CategoryResponse updateCategory(UUID id, UpdateCategoryDto updateCategoryDto) {
+    public CategoryResponse updateCategory(UUID id, CategoryUpdateDto categoryUpdateDto) {
         Category category = categoryRepository.findByIdAndDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category", "id", id));
-        category.setName(updateCategoryDto.getName());
-        category.setSlug(updateCategoryDto.getName().toLowerCase().replace(" ", "-"));
-        category.setDescription(updateCategoryDto.getDescription());
-        category.setImage(updateCategoryDto.getImage());
-        category.setParentCategoryId(UUID.fromString(updateCategoryDto.getParentCategoryId()));
-        category.setUpdatedAt(updateCategoryDto.getUpdatedAt());
+        category.setName(categoryUpdateDto.getName());
+        category.setSlug(categoryUpdateDto.getName().toLowerCase().replace(" ", "-"));
+        category.setDescription(categoryUpdateDto.getDescription());
+        category.setImage(categoryUpdateDto.getImage());
+        category.setUpdatedAt(categoryUpdateDto.getUpdatedAt());
         category.setUpdatedUser("MARIA PEREZ");
+
+        if (categoryUpdateDto.getParentCategoryId() != null) {
+            Category parentCategory = categoryRepository.findById(UUID.fromString(categoryUpdateDto.getParentCategoryId()))
+                    .orElseThrow(() -> new ResourceNotFoundException("Category", "parentCategoryId", categoryUpdateDto.getParentCategoryId()));
+            category.setParentCategory(parentCategory);
+        } else {
+            category.setParentCategory(null);
+        }
         categoryRepository.save(category);
         return mapToCategoryResponse(category);
     }
@@ -79,7 +97,7 @@ public class CategoryService {
     private CategoryResponse mapToCategoryResponse(Category category) {
         return CategoryResponse.builder()
                 .id(category.getId())
-                .parentCategoryId(UUID.fromString(String.valueOf(category.getParentCategoryId())))
+                .parentCategoryId(category.getParentCategory() != null ? category.getParentCategory().getId() : null)
                 .slug(category.getSlug())
                 .disabledReason(category.getDisabledReason())
                 .deleted(category.getDeleted())
@@ -91,8 +109,6 @@ public class CategoryService {
                 .enabled(category.getEnabled())
                 .image(category.getImage())
                 .name(category.getName())
-                .description(category.getDescription())
-                .image(category.getImage())
                 .build();
     }
 }

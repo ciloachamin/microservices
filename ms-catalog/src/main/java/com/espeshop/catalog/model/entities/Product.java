@@ -6,10 +6,12 @@ import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "product")
+@Table(name = "products")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -23,8 +25,10 @@ public class Product {
     @Column(name = "user_id", nullable = false, columnDefinition = "UUID")
     private UUID userId;
 
-    @Column(name = "category_id", nullable = false, columnDefinition = "UUID")
-    private UUID categoryId;
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
 
     @Column(name = "company_id", nullable = false, columnDefinition = "UUID")
     private UUID companyId;
@@ -73,6 +77,12 @@ public class Product {
 
     @Column
     private String updatedUser;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<ProductAttribute> productAttributes = new HashSet<>();
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Image> images = new HashSet<>();
 
     @Override
     public String toString() {

@@ -8,13 +8,13 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "images")
+@Table(name = "products_file")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Image {
+public class ProductFile {
 
     @Id
     @UuidGenerator
@@ -22,10 +22,10 @@ public class Image {
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    private Product product;;
 
     @Column(columnDefinition = "TEXT")
-    private String imageUrl;
+    private String productFileUrl;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT NULL")
     private Boolean enabled;

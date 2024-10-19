@@ -5,6 +5,8 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -29,7 +31,14 @@ public class Category {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private UUID parentCategoryId;
+    @ManyToOne
+    @JoinColumn(name = "parent_category_id")
+    private Category parentCategory;
+
+
+    @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.ALL)
+    private Set<Category> subCategories = new HashSet<>();
+
 
     @Column(columnDefinition = "TEXT")
     private String image;

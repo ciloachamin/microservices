@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UpdateProductDto {
+public class ProductUpdateDto {
 
     @Schema(example = "123e4567-e89b-12d3-a456-426614174000", description = "ID de la categoría a la que pertenece el producto")
     private UUID categoryId;

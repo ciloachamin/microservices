@@ -11,7 +11,7 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class FilterProductDto {
+public class ProductFilterDto {
     private OffsetDateTime dateBegin;
     private OffsetDateTime dateEnd;
     private String name;

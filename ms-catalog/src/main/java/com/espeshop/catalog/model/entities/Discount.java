@@ -8,13 +8,13 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "images")
+@Table(name = "discounts")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Image {
+public class Discount {
 
     @Id
     @UuidGenerator
@@ -24,8 +24,27 @@ public class Image {
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
+    @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
+    private Integer discount;
+
     @Column(columnDefinition = "TEXT")
-    private String imageUrl;
+    private String description;
+
+    @Column( nullable = false, length = 100)
+    private String discountType;
+
+    @Column
+    private OffsetDateTime startDate;
+
+    @Column
+    private OffsetDateTime endDate;
 
     @Column(columnDefinition = "BOOLEAN DEFAULT NULL")
     private Boolean enabled;
