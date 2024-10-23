@@ -15,13 +15,13 @@ import java.time.OffsetDateTime;
 @Builder
 public class AttributeUpdateDto {
 
-    @Schema(example = "Color", description = "Nombre del Producto")
+    @Schema(example = "Capacidad", description = "Nombre del atributo del producto")
     @NotBlank(message = "El campo 'name' no puede estar vacío")
     @Size(max = 50, message = "El campo 'name' debe tener un máximo de 50 caracteres")
     private String name;
 
-    @Schema(example = "Product", description = "Nombre del Producto")
-    @NotBlank(message = "El campo 'name' no puede estar vacío") @Size(max = 50, message = "El campo 'name' debe tener un máximo de 50 caracteres")
+    @Schema(example = "Texto", description = "Tipo de dato del atributo")
+    @NotBlank(message = "El campo 'dataType' no puede estar vacío")
+    @Size(max = 50, message = "El campo 'dataType' debe tener un máximo de 50 caracteres")
     private String dataType;
-
 }

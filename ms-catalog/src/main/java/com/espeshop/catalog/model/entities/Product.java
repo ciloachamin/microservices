@@ -48,6 +48,9 @@ public class Product {
     @Column(name = "stock")
     private Integer stock;
 
+    @Column(nullable = false)
+    private Integer rating;
+
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
@@ -78,11 +81,14 @@ public class Product {
     @Column
     private String updatedUser;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<ProductAttribute> productAttributes = new HashSet<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<ProductAttribute> productAttribute;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<Image> images = new HashSet<>();
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<Image> images = new HashSet<>(); // Inicializar el conjunto
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<ProductFile> productFiles = new HashSet<>(); // Inicializar el conjunto
 
     @Override
     public String toString() {

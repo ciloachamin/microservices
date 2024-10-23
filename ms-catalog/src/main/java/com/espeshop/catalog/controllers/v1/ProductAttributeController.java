@@ -2,6 +2,7 @@
 //
 //import com.espeshop.catalog.model.dtos.*;
 //import com.espeshop.catalog.model.entities.ProductAttribute;
+//import com.espeshop.catalog.model.keys.ProductAttributeKey;
 //import com.espeshop.catalog.services.ProductAttributeService;
 //import io.swagger.v3.oas.annotations.Operation;
 //import io.swagger.v3.oas.annotations.Parameter;
@@ -26,15 +27,19 @@
 //
 //    private final ProductAttributeService productAttributeService;
 //
-//    @PostMapping("/ProductAttribute")
+//    @PostMapping("/product-attribute")
 //    @ResponseStatus(HttpStatus.CREATED)
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
 //    @Operation(
 //            summary = "Create a new ProductAttribute",
-//            description = "This endpoint allows administrators to create a new ProductAttribute. Only users with 'ROLE_ADMIN' can access this."
+//            description = "This endpoint allows administrators to create a new ProductAttribute."
 //    )
-//    public ResponseEntity<CustomApiResponse<ProductAttributeResponse>> createProductAttribute(@RequestBody @Valid ProductAttributeRequest ProductAttributeRequest, HttpServletRequest request) {
-//        ProductAttributeResponse createdProductAttribute = productAttributeService.createProductAttribute(ProductAttributeRequest);
+//    public ResponseEntity<CustomApiResponse<ProductAttributeResponse>> createProductAttribute(
+//            @RequestBody @Valid ProductAttributeRequest productAttributeRequest,
+//            HttpServletRequest request) {
+//
+//        ProductAttributeResponse createdProductAttribute = productAttributeService.createProductAttribute(productAttributeRequest);
+//
 //        CustomApiResponse<ProductAttributeResponse> response = new CustomApiResponse<>(
 //                HttpStatus.CREATED.value(),
 //                true,
@@ -46,24 +51,21 @@
 //        return new ResponseEntity<>(response, HttpStatus.CREATED);
 //    }
 //
-//    @GetMapping("/productsAttributes")
+//    @GetMapping("/products-attributes")
 //    @ResponseStatus(HttpStatus.OK)
 //    @PreAuthorize("hasRole('ROLE_USER')")
 //    @Operation(
 //            summary = "Get all productsAttributes",
-//            description = "Retrieve a list of all productsAttributes.",
-//            parameters = {
-//                    @Parameter(name = "productId", required = false),
-//                    @Parameter(name = "attributeId", required = false),
-//            }
+//            description = "Retrieve a list of all productsAttributes."
 //    )
 //    public ResponseEntity<CustomApiResponse<List<ProductAttributeResponse>>> getAllProductsAttributes(
 //            @RequestParam(required = false) UUID attributeId,
 //            @RequestParam(required = false) UUID productId,
-//            HttpServletRequest request
-//    ) {
-//        ProductAttributeFilterDto filters = new ProductAttributeFilterDto(attributeId,productId);
+//            HttpServletRequest request) {
+//
+//        ProductAttributeFilterDto filters = new ProductAttributeFilterDto(attributeId, productId);
 //        List<ProductAttributeResponse> productsAttributes = productAttributeService.getAllProductsAttributes(filters);
+//
 //        CustomApiResponse<List<ProductAttributeResponse>> response = new CustomApiResponse<>(
 //                HttpStatus.OK.value(),
 //                true,
@@ -75,7 +77,7 @@
 //        return ResponseEntity.ok(response);
 //    }
 //
-//    @GetMapping("/ProductAttribute/{id}")
+//    @GetMapping("/product-attribute/{productId}/{attributeId}")
 //    @ResponseStatus(HttpStatus.OK)
 //    @PreAuthorize("hasRole('ROLE_USER')")
 //    @Operation(
@@ -83,32 +85,40 @@
 //            description = "Retrieve a ProductAttribute by its ID."
 //    )
 //    public ResponseEntity<CustomApiResponse<ProductAttribute>> getProductAttributeById(
-//            @PathVariable UUID id,
+//            @PathVariable UUID productId,
+//            @PathVariable UUID attributeId,
 //            HttpServletRequest request) {
-//        ProductAttribute ProductAttributeResponse = productAttributeService.getProductAttributeById(id);
+//
+//        ProductAttributeKey key = new ProductAttributeKey(productId, attributeId);
+//        ProductAttribute productAttribute = productAttributeService.getProductAttributeById(key);
+//
 //        CustomApiResponse<ProductAttribute> response = new CustomApiResponse<>(
 //                HttpStatus.OK.value(),
 //                true,
 //                "ProductAttribute retrieved successfully",
 //                request.getRequestURI(),
 //                LocalDateTime.now(),
-//                ProductAttributeResponse
+//                productAttribute
 //        );
 //        return ResponseEntity.ok(response);
 //    }
 //
-//    @PutMapping("ProductAttribute/{id}")
+//    @PutMapping("/product-attribute/{productId}/{attributeId}")
 //    @ResponseStatus(HttpStatus.OK)
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
 //    @Operation(
 //            summary = "Update an existing ProductAttribute",
-//            description = "This endpoint allows administrators to update an existing ProductAttribute. Only users with 'ROLE_ADMIN' can access this."
+//            description = "This endpoint allows administrators to update an existing ProductAttribute."
 //    )
 //    public ResponseEntity<CustomApiResponse<ProductAttributeResponse>> updateProductAttribute(
-//            @PathVariable UUID id,
-//            @RequestBody @Valid ProductAttributeUpdateDto ProductAttributeUpdateDto,
+//            @PathVariable UUID productId,
+//            @PathVariable UUID attributeId,
+//            @RequestBody @Valid ProductAttributeUpdateDto productAttributeUpdateDto,
 //            HttpServletRequest request) {
-//        ProductAttributeResponse updatedProductAttribute = productAttributeService.updateProductAttribute(id, ProductAttributeUpdateDto);
+//
+//        ProductAttributeKey key = new ProductAttributeKey(productId, attributeId);
+//        ProductAttributeResponse updatedProductAttribute = productAttributeService.updateProductAttribute(key, productAttributeUpdateDto);
+//
 //        CustomApiResponse<ProductAttributeResponse> response = new CustomApiResponse<>(
 //                HttpStatus.OK.value(),
 //                true,
@@ -120,17 +130,21 @@
 //        return ResponseEntity.ok(response);
 //    }
 //
-//    @DeleteMapping("ProductAttribute/{id}")
+//    @DeleteMapping("/product-attribute/{productId}/{attributeId}")
 //    @ResponseStatus(HttpStatus.NO_CONTENT)
 //    @PreAuthorize("hasRole('ROLE_ADMIN')")
 //    @Operation(
 //            summary = "Delete a ProductAttribute",
-//            description = "This endpoint allows administrators to delete a ProductAttribute. Only users with 'ROLE_ADMIN' can access this."
+//            description = "This endpoint allows administrators to delete a ProductAttribute."
 //    )
 //    public ResponseEntity<CustomApiResponse<ProductAttributeResponse>> deleteProductAttribute(
-//            @PathVariable UUID id,
+//            @PathVariable UUID productId,
+//            @PathVariable UUID attributeId,
 //            HttpServletRequest request) {
-//        ProductAttributeResponse deletedProductAttribute = productAttributeService.deleteProductAttribute(id);
+//
+//        ProductAttributeKey key = new ProductAttributeKey(productId, attributeId);
+//        ProductAttributeResponse deletedProductAttribute = productAttributeService.deleteProductAttribute(key);
+//
 //        CustomApiResponse<ProductAttributeResponse> response = new CustomApiResponse<>(
 //                HttpStatus.OK.value(),
 //                true,

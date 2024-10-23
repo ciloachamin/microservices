@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface ProductRepository extends JpaRepository<Product, Long>, ProductExtendedRepository {
     Optional<Product> findByName(String productName);
     Optional<Product> findByIdAndDeletedFalse(UUID id);
-    @EntityGraph(attributePaths = {"images"})
+    @EntityGraph(attributePaths = {"images","productFiles"})
     Optional<Product> findById(UUID id);
 
 }

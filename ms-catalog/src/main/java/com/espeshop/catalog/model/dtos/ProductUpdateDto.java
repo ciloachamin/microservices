@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Data
@@ -51,10 +52,27 @@ public class ProductUpdateDto {
     @Min(value = 0, message = "El stock debe ser al menos 0")
     private Integer stock;
 
+    @Schema(example = "5", description = "Calificación del producto (1 a 5)")
+    @NotNull(message = "El campo 'rating' es obligatorio")
+    @Min(value = 1, message = "La calificación debe ser al menos 1")
+    @Max(value = 5, message = "La calificación no puede ser mayor a 5")
+    private Integer rating;
+
 
     @Schema(description = "Fecha de última actualización de la categoría")
     private OffsetDateTime updatedAt;
 
-//    @Schema(example = "JUAN", description = "Usuario que actualizó la categoría")
+    //    @Schema(example = "JUAN", description = "Usuario que actualizó la categoría")
 //    private String updatedUser;
+// Nuevo campo para las URLs de imágenes
+    @Schema(description = "Lista de URLs de imágenes del producto")
+    private List<String> imageUrls;
+
+    // Nuevo campo para las URLs de imágenes
+    @Schema(description = "Lista de URLs de Archivos del producto")
+    private List<String> productFileUrls;
+
+    // Nuevo campo para los atributos del producto
+    @Schema(description = "Lista de atributos del producto")
+    private List<AttributeRequest> attributes;  // Este campo contendrá los atributos del producto
 }

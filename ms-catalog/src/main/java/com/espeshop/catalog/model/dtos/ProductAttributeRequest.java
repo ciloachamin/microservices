@@ -24,7 +24,7 @@ public class ProductAttributeRequest {
     @NotNull(message = "El campo 'productId' es obligatorio")
     private UUID productId;
 
-    @Schema(example = "value", description = "Marca del Producto")
+    @Schema(example = "Rojo", description = "Valor del atributo")
     @NotBlank(message = "El campo 'value' no puede estar vacío")
     private String value;
 }

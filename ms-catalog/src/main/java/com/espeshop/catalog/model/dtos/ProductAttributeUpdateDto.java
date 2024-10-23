@@ -14,7 +14,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @Builder
 public class ProductAttributeUpdateDto {
-    @Schema(example = "value", description = "Marca del Producto")
+    @Schema(example = "Azul", description = "Marca del Producto")
     @NotBlank(message = "El campo 'value' no puede estar vacío")
     private String value;
 }

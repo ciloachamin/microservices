@@ -66,6 +66,7 @@ public class ProductController {
                     @Parameter(name = "code", required = false),
                     @Parameter(name = "barcode", required = false),
                     @Parameter(name = "stock", required = false),
+                    @Parameter(name = "rating", required = false),
                     @Parameter(name = "brand", required = false),
                     @Parameter(name = "deleted", required = false),
                     @Parameter(name = "enabled", required = false),
@@ -86,7 +87,8 @@ public class ProductController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String code,
             @RequestParam(required = false) String barcode,
-            @RequestParam(required = false) String stock,
+            @RequestParam(required = false) Integer stock,
+            @RequestParam(required = false) Integer rating,
             @RequestParam(required = false) String brand,
             @RequestParam(required = false) Boolean deleted,
             @RequestParam(required = false) Boolean enabled,
@@ -108,6 +110,7 @@ public class ProductController {
                 name,
                 code,
                 stock,
+                rating,
                 brand,
                 barcode,
                 deleted,
@@ -189,15 +192,6 @@ public class ProductController {
             @PathVariable UUID id,
             HttpServletRequest request) {
         ProductResponse productResponse = productService.getProductByIds(id);
-        Set<ImageResponse> images = productResponse.getImages().stream()
-                .map(image -> ImageResponse.builder()
-                        .id(image.getId())
-                        .imageUrl(image.getImageUrl())
-                        .createdAt(image.getCreatedAt())
-                        .createdUser(image.getCreatedUser())
-                        .build())
-                .collect(Collectors.toSet());
-
         CustomApiResponse<ProductResponse> response = new CustomApiResponse<>(
                 HttpStatus.OK.value(),
                 true,

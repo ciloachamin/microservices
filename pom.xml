@@ -40,6 +40,7 @@
 		<module>api-gateway</module>
 		<module>ms-eureka</module>
 		<module>ms-notification</module>
+		<module>ms-users</module>
 	</modules>
 
 	<dependencies>

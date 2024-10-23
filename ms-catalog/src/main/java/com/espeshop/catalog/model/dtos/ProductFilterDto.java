@@ -16,7 +16,8 @@ public class ProductFilterDto {
     private OffsetDateTime dateEnd;
     private String name;
     private String code;
-    private String stock;
+    private Integer stock;
+    private Integer rating;
     private String brand;
     private String barcode;
     private Boolean deleted;
@@ -34,7 +35,8 @@ public class ProductFilterDto {
     public boolean isEmpty() {
         return (name == null || name.isEmpty()) &&
                 (code == null || code.isEmpty()) &&
-                (stock == null || stock.isEmpty()) &&
+                stock == null  &&
+                rating == null &&
                 priceMin == null &&
                 priceMax == null &&
                 categoryId == null &&

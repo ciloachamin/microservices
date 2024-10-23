@@ -1,5 +1,6 @@
 package com.espeshop.catalog.model.dtos;
 
+import com.espeshop.catalog.model.entities.ProductAttribute;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,12 +20,14 @@ public class ProductResponse {
     private UUID id;
     private UUID userId;
     private UUID categoryId;
+    private String categoryName;
     private UUID companyId;
     private String name;
     private String slug;
     private String brand;
     private BigDecimal price;
     private Integer stock;
+    private Integer rating;
     private String description;
     private String code;
     private String barcode;
@@ -37,6 +40,8 @@ public class ProductResponse {
     private String updatedUser;
 
     private Set<ImageResponse> images;
+    private Set<ProductFileResponse> productFiles;
+    private Set<AttributeResponse> attributes;
 
 
 }

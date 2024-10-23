@@ -15,5 +15,6 @@ import java.util.UUID;
 public class AttributeResponse {
     private UUID id;
     private String name;
+    private String value;
     private String dataType;
 }

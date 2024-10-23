@@ -47,10 +47,13 @@ public class ProductExtendedRepositoryImpl implements ProductExtendedRepository 
         }
 
         if (filters.getStock() != null) {
-            Predicate stokePredicate = cb.like(root.get("stock"), filters.getStock());
-            predicates.add(stokePredicate);
+            Predicate stokPredicate = cb.equal(root.get("stock"), filters.getStock());
+            predicates.add(stokPredicate);
         }
-
+        if (filters.getRating() != null) {
+            Predicate ratingPredicate= (cb.equal(root.get("rating"), filters.getRating()));
+            predicates.add(ratingPredicate);
+        }
         if (filters.getDateBegin() != null && filters.getDateEnd() != null) {
             Predicate dateRangePredicate = cb.between(root.get("createdAt"), filters.getDateBegin(), filters.getDateEnd());
             predicates.add(dateRangePredicate);

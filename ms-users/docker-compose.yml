@@ -1,0 +1,23 @@
+
+### Postgres Database for Users Service
+services:
+  db-users:
+    container_name: db-users
+    image: postgres:15.2
+    environment:
+      POSTGRES_DB: ms_users
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - "5436:5432"
+    expose:
+      - "5436"
+    volumes:
+      - db-users-data:/var/lib/postgresql/data
+    networks:
+      - ms-marketplace-network
+    restart: unless-stopped
+networks:
+  ms-marketplace-network:
+volumes:
+  db-users-data:

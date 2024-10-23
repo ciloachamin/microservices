@@ -1,21 +1,19 @@
 package com.espeshop.catalog.services;
 
+import com.espeshop.catalog.dao.repositories.AttributeRepository;
 import com.espeshop.catalog.dao.repositories.ProductAttributeRepository;
 import com.espeshop.catalog.dao.repositories.ProductRepository;
 import com.espeshop.catalog.exception.ResourceNotFoundException;
-import com.espeshop.catalog.model.dtos.ProductAttributeFilterDto;
-import com.espeshop.catalog.model.dtos.ProductAttributeRequest;
-import com.espeshop.catalog.model.dtos.ProductAttributeResponse;
-import com.espeshop.catalog.model.dtos.ProductAttributeUpdateDto;
+import com.espeshop.catalog.model.dtos.*;
+import com.espeshop.catalog.model.entities.Attribute;
 import com.espeshop.catalog.model.entities.Product;
 import com.espeshop.catalog.model.entities.ProductAttribute;
+import com.espeshop.catalog.model.keys.ProductAttributeKey;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,56 +22,67 @@ import java.util.stream.Collectors;
 public class ProductAttributeService {
     private final ProductAttributeRepository productAttributeRepository;
     private final ProductRepository productRepository;
+    private final AttributeRepository attributeRepository;
 
     public ProductAttributeResponse createProductAttribute(ProductAttributeRequest productAttributeRequest) {
-        Product product = (Product) productRepository.findById(productAttributeRequest.getProductId())
+        Product product = productRepository.findById(productAttributeRequest.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product", "id", productAttributeRequest.getProductId()));
 
+        Attribute attribute = attributeRepository.findById(productAttributeRequest.getAttributeId())
+                .orElseThrow(() -> new ResourceNotFoundException("Attribute", "id", productAttributeRequest.getAttributeId()));
+
+        ProductAttributeKey key = new ProductAttributeKey(product.getId(), attribute.getId());
         ProductAttribute productAttribute = ProductAttribute.builder()
+                .id(key)
                 .product(product)
+                .attribute(attribute)
                 .value(productAttributeRequest.getValue())
                 .build();
-        return mapToProductAttributeResponse(productAttribute);
 
+        // Save the productAttribute to the repository
+        productAttributeRepository.save(productAttribute);
+
+        return mapToProductAttributeResponse(productAttribute);
     }
 
     public List<ProductAttributeResponse> getAllProductsAttributes(ProductAttributeFilterDto filters) {
-//        log.info("Filters: {}", filters);
-        List<ProductAttribute> productsAttributes;
-        if (filters == null || filters.isEmpty()) {
-            productsAttributes = productAttributeRepository.findAll();
-        } else {
-            productsAttributes = productAttributeRepository.findAllProductsAttributes(filters);
-        }
+        List<ProductAttribute> productsAttributes = filters == null || filters.isEmpty()
+                ? productAttributeRepository.findAll()
+                : productAttributeRepository.findAllProductsAttributes(filters);
+
         return productsAttributes.stream()
                 .map(this::mapToProductAttributeResponse)
                 .collect(Collectors.toList());
     }
 
-    public ProductAttribute getProductAttributeById(UUID id) {
+    public ProductAttribute getProductAttributeById(ProductAttributeKey id) {
         return productAttributeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ProductAttribute", "id", id));
     }
 
-    public ProductAttributeResponse updateProductAttribute(UUID id, ProductAttributeUpdateDto productAttributeUpdateDto) {
+    public ProductAttributeResponse updateProductAttribute(ProductAttributeKey id, ProductAttributeUpdateDto productAttributeUpdateDto) {
         ProductAttribute productAttribute = productAttributeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ProductAttribute", "id", id));
+
         productAttribute.setValue(productAttributeUpdateDto.getValue());
         productAttributeRepository.save(productAttribute);
+
         return mapToProductAttributeResponse(productAttribute);
     }
 
-    public ProductAttributeResponse deleteProductAttribute(UUID id) {
+    public ProductAttributeResponse deleteProductAttribute(ProductAttributeKey id) {
         ProductAttribute productAttribute = productAttributeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ProductAttribute", "id", id));
-        productAttributeRepository.save(productAttribute);
+
+        // Delete the ProductAttribute from the repository
+        productAttributeRepository.deleteById(id);
+
         return mapToProductAttributeResponse(productAttribute);
     }
 
     private ProductAttributeResponse mapToProductAttributeResponse(ProductAttribute productAttribute) {
         return ProductAttributeResponse.builder()
                 .id(productAttribute.getId())
-                .productId(productAttribute.getProduct())
                 .value(productAttribute.getValue())
                 .build();
     }
